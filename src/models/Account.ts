@@ -7,7 +7,6 @@ interface IAccount {
 	username: string;
 	phone: string;
 	password: string;
-	avatar: string;
 	role: UserRole;
 }
 
@@ -15,7 +14,6 @@ const accountSchema = new Schema<IAccount>({
 	username: { type: String, required: true, index: true },
 	phone: { type: String, required: true },
 	password: { type: String, required: true },
-	avatar: { type: String, required: true },
 	role: { type: String, required: true, default: "user" },
 });
 
