@@ -2,6 +2,8 @@ import express, { NextFunction, Request, Response } from "express";
 import dotenv from "dotenv";
 import ConnectDB from "./utils/ConnectDB";
 import router from "./routes";
+import cors from "cors";
+import cookieParser from "cookie-parser";
 
 // Configurations
 dotenv.config();
@@ -12,8 +14,17 @@ const app = express();
 
 // Provides static files
 app.use(express.static("public"));
+
+// Use middlewares
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
+app.use(
+	cors({
+		credentials: true,
+		origin: "*",
+	})
+);
 
 // Connect to database
 ConnectDB.connectDB();

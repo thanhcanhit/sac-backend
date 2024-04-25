@@ -16,12 +16,14 @@ interface ICustomer {
 interface IOrder {
 	_id: ObjectId;
 	orderDate: Date;
+	customerId: ObjectId;
 	customer: ICustomer;
 	orderDetails: IOrderDetail[];
 }
 
 const orderSchema = new Schema<IOrder>({
 	orderDate: { type: Date, required: true, default: Date.now() },
+	customerId: {type: Types.ObjectId, required: true, ref: "Customer"},
 	customer: {
 		name: { type: String, required: true },
 		phone: { type: String, required: true },

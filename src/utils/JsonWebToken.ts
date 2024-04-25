@@ -9,7 +9,9 @@ class JsonWebToken {
 	}
 
 	static generatePublicToken(payload: any) {
-		return jwt.sign(payload, this.publicKey, { expiresIn: "7d" });
+		return jwt.sign({ ...payload, isUsed: false }, this.publicKey, {
+			expiresIn: "7d",
+		});
 	}
 
 	static verifyPrivateToken(token: string) {
