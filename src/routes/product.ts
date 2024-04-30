@@ -6,6 +6,7 @@ const productRouter = express.Router();
 const productController = new ProductController();
 const middlewareController = new MiddlewareController();
 
+productRouter.get("/size", productController.getProductSize);
 productRouter.get("/:id", productController.getProductById);
 productRouter.get("/", productController.getAllProducts);
 productRouter.post(

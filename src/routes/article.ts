@@ -7,6 +7,7 @@ const articleRouter = express.Router();
 const articleController = new ArticleController();
 const middlewareController = new MiddlewareController();
 
+articleRouter.get("/size", articleController.getArticleSize);
 articleRouter.get("/:id", articleController.getArticleById);
 articleRouter.get("/", articleController.getAllArticles);
 articleRouter.post(

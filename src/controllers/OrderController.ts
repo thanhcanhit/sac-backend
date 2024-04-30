@@ -42,8 +42,8 @@ class OrderController {
 	// POST /orders
 	public async createOrder(req: Request, res: Response): Promise<boolean> {
 		try {
-			const { customer, orderDetails } = req.body;
-			const newOrder = new Order({ customer, orderDetails });
+			const { customer, orderDetails, customerId } = req.body;
+			const newOrder = new Order({ customer, orderDetails, customerId });
 			await newOrder.save();
 
 			const order = await Order.findById(newOrder._id);

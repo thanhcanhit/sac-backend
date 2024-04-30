@@ -4,9 +4,14 @@ import ConnectDB from "./utils/ConnectDB";
 import router from "./routes";
 import cors from "cors";
 import cookieParser from "cookie-parser";
+import morgan from "morgan";
 
 // Configurations
-dotenv.config();
+if (process.env.NODE_ENV !== "production") {
+	dotenv.config();
+} else {
+	dotenv.config({ path: ".env.production" });
+}
 
 // Constants
 const PORT = process.env.PORT || 3000;
@@ -16,15 +21,16 @@ const app = express();
 app.use(express.static("public"));
 
 // Use middlewares
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(cookieParser());
+app.use(morgan("dev"));
 app.use(
 	cors({
 		credentials: true,
 		origin: "*",
 	})
 );
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
 // Connect to database
 ConnectDB.connectDB();

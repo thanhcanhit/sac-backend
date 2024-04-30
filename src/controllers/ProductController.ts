@@ -51,7 +51,7 @@ class ProductController {
 				discount,
 				description,
 			});
-			newProduct.save();
+			await newProduct.save();
 			const product = await Product.findById(newProduct._id);
 			res.status(201).json({ message: "Create product", product });
 			return true;
@@ -89,6 +89,18 @@ class ProductController {
 			res.status(200).json({ message: `Delete product with ID ${productId}` });
 		} catch (err) {
 			res.status(500).json({ message: "Error deleting product", error: err });
+		}
+	}
+
+	// GET /products/size
+	public async getProductSize(req: Request, res: Response): Promise<void> {
+		try {
+			const size = await Product.countDocuments();
+			res.status(200).json({ message: "Get product size", size });
+		} catch (err) {
+			res
+				.status(500)
+				.json({ message: "Error getting product size", error: err });
 		}
 	}
 }

@@ -9,12 +9,13 @@ class ArticleController {
 			let articles;
 			if (limit && page) {
 				articles = await Article.find()
+					.sort({ publishedAt: -1 })
 					.limit(Number(limit))
 					.skip((Number(page) - 1) * Number(limit));
 			} else {
-				articles = await Article.find();
+				articles = await Article.find().sort({ publishDate: -1 });
 			}
-			
+
 			const list = articles.map((article) => article.toObject());
 			res.status(200).json({ message: "Get all articles", allArticle: list });
 		} catch (err) {
@@ -82,6 +83,18 @@ class ArticleController {
 			res.status(200).json({ message: `Delete article with ID ${articleId}` });
 		} catch (err) {
 			res.status(500).json({ message: "Error deleting article", error: err });
+		}
+	}
+
+	// GET /articles/size
+	public async getArticleSize(req: Request, res: Response): Promise<void> {
+		try {
+			const size = await Article.countDocuments();
+			res.status(200).json({ message: "Get article size", size });
+		} catch (err) {
+			res
+				.status(500)
+				.json({ message: "Error getting article size", error: err });
 		}
 	}
 }

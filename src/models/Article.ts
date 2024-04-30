@@ -1,4 +1,4 @@
-import { ObjectId, Schema, Types, model } from "mongoose";
+import { ObjectId, Schema, model } from "mongoose";
 
 interface IArticle {
 	_id: ObjectId;

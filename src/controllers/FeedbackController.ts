@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import Feedback from "../models/Feedback";
+import Product from "../models/Product";
 
 class FeedbackController {
 	// GET /feedbacks?limit=10&page=1
@@ -62,9 +63,27 @@ class FeedbackController {
 	public async createFeedback(req: Request, res: Response): Promise<boolean> {
 		try {
 			const { rate, content, user_id, product_id } = req.body;
+
+			const product = await Product.findById(product_id);
+			if (!product) {
+				res.status(404).json({ message: "Product not found" });
+				return true;
+			}
+
+			// Update product rate
+			const totalRate = product.rate * product.quantityRate + rate;
+			const newQuantityRate = product.quantityRate + 1;
+			const newRate = totalRate / newQuantityRate;
+			await Product.findOneAndUpdate(
+				{ _id: product_id },
+				{ rate: newRate, quantityRate: newQuantityRate }
+			);
+
+			// Create feedback
 			const newFeedback = new Feedback({ rate, content, user_id, product_id });
 			await newFeedback.save();
 			const feedback = await Feedback.findById(newFeedback);
+
 			res.status(201).json({ message: "Create feedback", feedback });
 			return true;
 		} catch (err) {
@@ -78,9 +97,31 @@ class FeedbackController {
 		try {
 			const feedbackId = req.params.id;
 			const { rate, content, user_id, product_id } = req.body;
+
+			// Check product exist
+			const product = await Product.findById(product_id);
+			if (!product) {
+				res.status(404).json({ message: "Product not found" });
+				return true;
+			}
+
+			// Check feedback exist
+			const feedback = await Feedback.findById(feedbackId);
+			if (!feedback) {
+				res.status(404).json({ message: "Feedback not found" });
+				return true;
+			}
+
+			// Update product rate
+			const oldRate = feedback.rate;
+			const totalRate = product.rate * product.quantityRate - oldRate + rate;
+			const newRate = totalRate / product.quantityRate;
+			await Product.findOneAndUpdate({ _id: product_id }, { rate: newRate });
+
+			// Update feedback
 			await Feedback.findOneAndUpdate(
 				{ _id: feedbackId },
-				{ rate, content, user_id, product_id, updatedAt: Date.now() }
+				{ rate, content, user_id, product_id }
 			);
 
 			res
@@ -97,6 +138,26 @@ class FeedbackController {
 	public async deleteFeedback(req: Request, res: Response): Promise<void> {
 		try {
 			const feedbackId = req.params.id;
+
+			const feedback = await Feedback.findById(feedbackId);
+			if (!feedback) {
+				res.status(404).json({ message: "Feedback not found" });
+				return;
+			}
+			const product = await Product.findById(feedback.product_id);
+			if (!product) {
+				res.status(404).json({ message: "Product not found" });
+				return;
+			}
+
+			// Update product rate when deleted feedback
+			const totalRate = product.rate * product.quantityRate - feedback.rate;
+			const newQuantityRate = product.quantityRate - 1;
+			const newRate = newQuantityRate === 0 ? 0 : totalRate / newQuantityRate;
+			await Product.findOneAndUpdate(
+				{ _id: feedback.product_id },
+				{ rate: newRate, quantityRate: newQuantityRate }
+			);
 
 			await Feedback.findOneAndDelete({ _id: feedbackId });
 

@@ -6,7 +6,7 @@ interface IFeedback {
 	content: string;
 	createdAt: Date;
 	user_id: ObjectId;
-  product_id: ObjectId;
+	product_id: ObjectId;
 }
 
 const feedbackSchema = new Schema<IFeedback>({
@@ -14,7 +14,7 @@ const feedbackSchema = new Schema<IFeedback>({
 	content: { type: String, required: true },
 	createdAt: { type: Date, required: true, default: Date.now() },
 	user_id: { type: Types.ObjectId, required: true, ref: "Account" },
-  product_id: { type: Types.ObjectId, required: true, ref: "Product" },
+	product_id: { type: Types.ObjectId, required: true, ref: "Product" },
 });
 
 export default model<IFeedback>("Feedback", feedbackSchema);

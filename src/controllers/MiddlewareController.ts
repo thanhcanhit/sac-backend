@@ -15,6 +15,7 @@ class MiddlewareController {
 			// Check token is valid
 			try {
 				const token = author.split(" ")[1];
+				console.log(token)
 				const decode = JsonWebToken.verifyPrivateToken(token);
 				req.body.decodeData = decode;
 				next();
@@ -28,7 +29,7 @@ class MiddlewareController {
 
 	verifyAdminToken(req: Request, res: Response, next: NextFunction) {
 		this.verifyToken(req, res, () => {
-			if (!req.body.decodeData.admin) {
+			if (!(req.body.decodeData?.role === "admin")) {
 				return res.sendStatus(403);
 			}
 			next();

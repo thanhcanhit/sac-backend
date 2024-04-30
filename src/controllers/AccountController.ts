@@ -17,7 +17,7 @@ class AccountController {
 
 	// POST /auth/register
 	public async register(req: Request, res: Response) {
-		const { username, phone, password } = req.body;
+		const { username, phone, password, gender, name } = req.body;
 
 		if (!username || !phone || !password) {
 			return res.status(400).json({ message: "Missing required fields" });
@@ -25,7 +25,13 @@ class AccountController {
 
 		const hashedPassword = await HashString.hash(password);
 		try {
-			const user = new Account({ username, phone, password: hashedPassword });
+			const user = new Account({
+				username,
+				phone,
+				password: hashedPassword,
+				gender,
+				name,
+			});
 			await user.save();
 			const { password, ...userWithoutPassword } = user.toObject();
 			res.status(201).json({
@@ -45,11 +51,12 @@ class AccountController {
 		}
 
 		const passwordInput = password as string;
+		console.log(req.body);
 
 		try {
 			const user = await Account.findOne({ username });
 			if (!user) {
-				return res.status(404).json({ message: "User not found" });
+				return res.status(401).json({ message: "User not found" });
 			}
 			const isPasswordMatch = await HashString.compare(
 				passwordInput,
