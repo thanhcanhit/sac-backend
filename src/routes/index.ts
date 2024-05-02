@@ -4,6 +4,7 @@ import productRouter from "./product";
 import orderRouter from "./order";
 import authRouter from "./auth";
 import feedbackRouter from "./feedback";
+import fileRouter from "./file";
 
 function router(app: Express) {
 	app.use("/articles", articleRoute);
@@ -11,6 +12,7 @@ function router(app: Express) {
 	app.use("/orders", orderRouter);
 	app.use("/feedbacks", feedbackRouter);
 	app.use("/auth", authRouter);
+	app.use("/files", fileRouter);
 }
 
 export default router;

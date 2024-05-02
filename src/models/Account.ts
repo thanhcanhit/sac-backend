@@ -6,7 +6,7 @@ type Gender = "male" | "female" | "other";
 interface IAccount {
 	_id: ObjectId;
 	username: string;
-	phone: string;
+	phone: string;	
 	password: string;
 	name: string;
 	gender: Gender;

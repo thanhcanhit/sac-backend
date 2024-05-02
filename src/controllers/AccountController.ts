@@ -100,12 +100,10 @@ class AccountController {
 	// POST /auth/refresh
 	async refresh(req: Request, res: Response, next: NextFunction) {
 		try {
-			console.log("COOKIES", req.cookies);
 			const refreshToken = req.cookies?.REFRESH_TOKEN;
 			if (!refreshToken) return res.sendStatus(401);
 			const decode = JsonWebToken.verifyPublicToken(refreshToken);
 			if (!decode || typeof decode !== "object") {
-				console.log("failed here");
 				return res.sendStatus(403);
 			}
 			if (decode?.isUsed) return res.sendStatus(403);
