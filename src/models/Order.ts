@@ -1,10 +1,11 @@
 import { ObjectId, Schema, Types, model } from "mongoose";
+import { IDiscount } from "./Product";
 
 interface IOrderDetail {
 	productId: ObjectId;
 	quantity: number;
 	price: number;
-	discount: number;
+	discount: IDiscount;
 }
 
 interface ICustomer {
@@ -22,8 +23,8 @@ interface IOrder {
 }
 
 const orderSchema = new Schema<IOrder>({
-	orderDate: { type: Date, required: true, default: Date.now() },
-	customerId: {type: Types.ObjectId, required: true, ref: "Customer"},
+	orderDate: { type: Date, required: true, default: Date.now },
+	customerId: { type: Types.ObjectId, required: true, ref: "Customer" },
 	customer: {
 		name: { type: String, required: true },
 		phone: { type: String, required: true },
@@ -34,7 +35,10 @@ const orderSchema = new Schema<IOrder>({
 			productId: { type: Types.ObjectId, required: true, ref: "Product" },
 			quantity: { type: Number, required: true },
 			price: { type: Number, required: true },
-			discount: { type: Number, required: true, default: 0 },
+			discount: {
+				type: { type: String, required: true, default: "percent" },
+				value: { type: Number, required: true, default: 0 },
+			},
 		},
 	],
 });

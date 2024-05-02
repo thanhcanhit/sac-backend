@@ -17,17 +17,19 @@ if (process.env.NODE_ENV !== "production") {
 const PORT = process.env.PORT || 3000;
 const app = express();
 
+// Support cors
+app.use(
+	cors({
+		origin: ["http://localhost:5173"],
+		credentials: true,
+	})
+);
+
 // Provides static files
 app.use(express.static("public"));
 
 // Use middlewares
 app.use(morgan("dev"));
-app.use(
-	cors({
-		credentials: true,
-		origin: "*",
-	})
-);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());

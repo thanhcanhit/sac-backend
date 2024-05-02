@@ -6,7 +6,8 @@ const feedbackRouter = express.Router();
 const feedbackController = new FeedbackController();
 const middlewareController = new MiddlewareController();
 
-feedbackRouter.get("/products/:id", feedbackController.getFeedbackById);
+feedbackRouter.get("/products/:product_id/size", feedbackController.getFeedbackSizeByProduct);
+feedbackRouter.get("/products/:product_id", feedbackController.getFeedbackByProduct);
 feedbackRouter.get("/:id", feedbackController.getFeedbackById);
 feedbackRouter.get("/", feedbackController.getAllFeedbacks);
 feedbackRouter.post(

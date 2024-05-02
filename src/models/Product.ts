@@ -1,14 +1,16 @@
 import { ObjectId, Schema, Types, model } from "mongoose";
 
+export interface IDiscount {
+	type: "percent" | "fixed";
+	value: number;
+}
+
 interface IProduct {
 	_id: ObjectId;
 	name: string;
 	images: string[];
 	price: number;
-	discount: {
-		type: "percent" | "fixed";
-		value: number;
-	};
+	discount: IDiscount;
 	description: string;
 	inventory: number;
 	rate: number;

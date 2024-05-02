@@ -15,8 +15,8 @@ const articleSchema = new Schema<IArticle>({
 	description: { type: String, required: true },
 	image: { type: String, required: true },
 	content: { type: String, required: true },
-	publishedAt: { type: Date, required: true, default: Date.now() },
-	updatedAt: { type: Date, required: true, default: Date.now() },
+	publishedAt: { type: Date, required: true, default: Date.now },
+	updatedAt: { type: Date, required: true, default: Date.now },
 });
 
 const Article = model<IArticle>("Article", articleSchema);
