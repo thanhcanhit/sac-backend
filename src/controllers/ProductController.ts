@@ -1,5 +1,8 @@
 import { Request, Response } from "express";
 import Product from "../models/Product";
+import FileController from "./FileController";
+
+const fileController = new FileController();
 
 class ProductController {
 	// GET /products?limit=10&page=1
@@ -53,6 +56,7 @@ class ProductController {
 			});
 			await newProduct.save();
 			const product = await Product.findById(newProduct._id);
+			fileController.cleanUpImageStorage(String(product?._id), "product");
 			res.status(201).json({ message: "Create product", product });
 			return true;
 		} catch (err) {
@@ -71,6 +75,7 @@ class ProductController {
 				{ name, images, price, discount, description, updatedAt: Date.now() }
 			);
 
+			fileController.cleanUpImageStorage(String(productId), "product");
 			res.status(200).json({ message: `Update product with ID ${productId}` });
 			return true;
 		} catch (err) {
@@ -85,6 +90,7 @@ class ProductController {
 			const productId = req.params.id;
 
 			await Product.findOneAndDelete({ _id: productId });
+			fileController.deleteImageStorage(String(productId));
 
 			res.status(200).json({ message: `Delete product with ID ${productId}` });
 		} catch (err) {

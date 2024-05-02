@@ -88,6 +88,20 @@ class FileController {
 
 		imageStorage.save();
 	}
+
+	async deleteImageStorage(ownerId: string) {
+		const imageStorage = await ImageStorage.findOne({
+			ownerId,
+		});
+
+		if (!imageStorage) return;
+
+		imageStorage.paths.forEach((storagePath) => {
+			fs.unlinkSync(storagePath);
+		});
+
+		await imageStorage.deleteOne();
+	}
 }
 
 export default FileController;

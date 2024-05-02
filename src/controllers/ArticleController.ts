@@ -1,5 +1,8 @@
 import { Request, Response } from "express";
 import Article from "../models/Article";
+import FileController from "./FileController";
+
+const fileController = new FileController();
 
 class ArticleController {
 	// GET /articles?limit=10&page=1
@@ -47,6 +50,11 @@ class ArticleController {
 			const newArticle = new Article({ title, description, image, content });
 			await newArticle.save();
 			const article = await Article.findById(newArticle);
+			if (!article) {
+				res.status(404).json({ message: "Article not found after created??" });
+				return false;
+			}
+			fileController.cleanUpImageStorage(String(article._id), "article");
 			res.status(201).json({ message: "Create article", article });
 			return true;
 		} catch (err) {
@@ -64,6 +72,7 @@ class ArticleController {
 				{ _id: articleId },
 				{ title, description, image, content, updatedAt: Date.now() }
 			);
+			fileController.cleanUpImageStorage(String(articleId), "article");
 
 			res.status(200).json({ message: `Update article with ID ${articleId}` });
 			return true;
@@ -79,6 +88,7 @@ class ArticleController {
 			const articleId = req.params.id;
 
 			await Article.findOneAndDelete({ _id: articleId });
+			await fileController.deleteImageStorage(String(articleId));
 
 			res.status(200).json({ message: `Delete article with ID ${articleId}` });
 		} catch (err) {
