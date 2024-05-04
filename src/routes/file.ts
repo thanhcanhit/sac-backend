@@ -9,8 +9,26 @@ const fileRouter = express.Router();
 const fileController = new FileController();
 const middlewareController = new MiddlewareController();
 
-fileRouter.post("/article", ArticleMulterInstance, fileController.uploadImage);
+fileRouter.post(
+	"/article/",
+	ArticleMulterInstance,
+	fileController.uploadToTemp
+);
+fileRouter.patch(
+	"/article/",
+	ArticleMulterInstance,
+	fileController.uploadImage
+);
 
-fileRouter.post("/product", ProductMulterInstance, fileController.uploadImage);
+fileRouter.post(
+	"/product/",
+	ProductMulterInstance,
+	fileController.uploadToTemp
+);
+fileRouter.patch(
+	"/product/",
+	ProductMulterInstance,
+	fileController.uploadImage
+);
 
 export default fileRouter;

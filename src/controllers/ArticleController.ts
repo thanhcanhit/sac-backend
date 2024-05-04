@@ -54,7 +54,7 @@ class ArticleController {
 				res.status(404).json({ message: "Article not found after created??" });
 				return false;
 			}
-			fileController.cleanUpImageStorage(String(article._id), "article");
+			fileController.changeOwnerOfTempFile(article._id, "article");
 			res.status(201).json({ message: "Create article", article });
 			return true;
 		} catch (err) {

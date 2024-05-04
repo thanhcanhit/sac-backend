@@ -56,7 +56,11 @@ class ProductController {
 			});
 			await newProduct.save();
 			const product = await Product.findById(newProduct._id);
-			fileController.cleanUpImageStorage(String(product?._id), "product");
+			if (!product) {
+				res.status(404).json({ message: "Not found product after created" });
+				return false;
+			}
+			fileController.changeOwnerOfTempFile(product._id, "product");
 			res.status(201).json({ message: "Create product", product });
 			return true;
 		} catch (err) {

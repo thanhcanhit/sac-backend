@@ -1,14 +1,16 @@
 import { ObjectId, Schema, Types, model } from "mongoose";
 
+export type OwnerType = "article" | "product";
+
 interface IImageStorage {
 	_id: ObjectId;
-	ownerType: "article" | "product";
+	ownerType: OwnerType;
 	ownerId: ObjectId;
 	paths: string[];
 }
 
 const imageStorageSchema = new Schema<IImageStorage>({
-	ownerType: { type: String, required: true },
+	ownerType: { type: String, required: true, default: "article" },
 	ownerId: { type: Types.ObjectId, required: true },
 	paths: { type: [String], required: true },
 });
