@@ -144,7 +144,9 @@ class FileController {
 			const ownerObject = await Article.findById(ownerId);
 
 			imageStorage.paths = imageStorage.paths.filter((storagePath) => {
-				const isUse = ownerObject?.content.includes(storagePath);
+				const isUse =
+					ownerObject?.image.includes(storagePath) ||
+					ownerObject?.content.includes(storagePath);
 
 				if (!isUse) {
 					fs.unlinkSync(storagePath);

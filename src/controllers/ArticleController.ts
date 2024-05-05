@@ -58,6 +58,7 @@ class ArticleController {
 			res.status(201).json({ message: "Create article", article });
 			return true;
 		} catch (err) {
+			console.log(err)
 			res.status(500).json({ message: "Error creating article", error: err });
 			return true;
 		}

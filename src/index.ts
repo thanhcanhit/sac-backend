@@ -5,7 +5,6 @@ import router from "./routes";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import morgan from "morgan";
-import MulterFactory from "./configs/multerConfig";
 import path from "path";
 
 // Configurations
@@ -22,7 +21,12 @@ const app = express();
 // Support cors
 app.use(
 	cors({
-		origin: ["http://localhost:5173", "http://localhost:3000"],
+		origin: [
+			"http://localhost:5173",
+			"http://localhost:3000",
+			"https://thanhcanhit.github.io",
+			"https://smartairconclothing.com",
+		],
 		credentials: true,
 	})
 );

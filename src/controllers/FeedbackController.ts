@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 import Feedback from "../models/Feedback";
 import Product from "../models/Product";
-import { Types } from "mongoose";
 
 class FeedbackController {
 	// GET /feedbacks?limit=10&page=1

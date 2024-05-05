@@ -7,7 +7,7 @@ class ConnectDB {
 	public static async connectDB() {
 		console.log("Connecting to ", this.connectString);
 		await mongoose
-			.connect("mongodb://localhost:27017/sac")
+			.connect(this.connectString)
 			.then(() => {
 				console.log("Connected to database");
 			})

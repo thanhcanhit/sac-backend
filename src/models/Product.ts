@@ -15,6 +15,7 @@ interface IProduct {
 	inventory: number;
 	rate: number;
 	quantityRate: number;
+	sold: number;
 }
 
 const productSchema = new Schema<IProduct>({
@@ -29,6 +30,7 @@ const productSchema = new Schema<IProduct>({
 	inventory: { type: Number, required: true, default: 0 },
 	rate: { type: Number, required: true, default: 0 },
 	quantityRate: { type: Number, required: true, default: 0 },
+	sold: { type: Number, required: true, default: 0 },
 });
 
 export default model<IProduct>("Product", productSchema);
