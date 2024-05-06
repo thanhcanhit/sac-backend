@@ -14,6 +14,7 @@ fileRouter.post(
 	ArticleMulterInstance,
 	fileController.uploadToTemp
 );
+
 fileRouter.patch(
 	"/article/",
 	ArticleMulterInstance,

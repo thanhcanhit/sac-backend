@@ -4,7 +4,7 @@ import ConnectDB from "./utils/ConnectDB";
 import router from "./routes";
 import cors from "cors";
 import cookieParser from "cookie-parser";
-import morgan from "morgan";
+
 import path from "path";
 
 // Configurations
@@ -26,13 +26,16 @@ app.use(
 			"http://localhost:3000",
 			"https://thanhcanhit.github.io",
 			"https://smartairconclothing.com",
+			"http://smartairconclothing.com",
 		],
 		credentials: true,
 	})
 );
 
 // Use middlewares
-app.use(morgan("dev"));
+if (process.env.NODE_ENV !== "production") {
+	app.use(require("morgan")("dev"));
+}
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
@@ -41,16 +44,28 @@ app.use(cookieParser());
 ConnectDB.connectDB();
 
 // Provides static files
-app.use("/public", express.static(path.join(__dirname, "../public")));
+// Provides static files
+if (process.env.NODE_ENV === "production") {
+	app.use("/public", express.static(path.join(__dirname, "public")));
+	app.use("/files", express.static(path.join(__dirname, "files")));
+} else {
+	app.use("/public", express.static(path.join(__dirname, "../public")));
+	app.use("/files", express.static(path.join(__dirname, "../files")));
+}
 // Routes
 router(app);
 
 // Handle Miđleware
 app.use((req: Request, res: Response) => {
 	// check url has /public
-	if (req.url.includes("/public")) {
-		const filePath = req.url;
-		res.status(200).sendFile(path.join(__dirname, "../", filePath));
+	if (req.url.includes("/files")) {
+		// remove /api from url
+		const filePath = req.url.replace("/api", "");
+		if (process.env.NODE_ENV === "production") {
+			res.status(200).sendFile(path.join(__dirname, filePath));
+		} else {
+			res.status(200).sendFile(path.join(__dirname, "../", filePath));
+		}
 		return;
 	}
 	res.status(404).json({ message: "Not found endpoint" });
@@ -59,7 +74,7 @@ app.use((req: Request, res: Response) => {
 // Error handler middleware
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
 	console.error(err.stack);
-	res.status(500).json({ message: "Internal Server Error" });
+	res.status(500).json({ message: "Internal Server Error", err: err });
 });
 
 // Start server

@@ -4,7 +4,7 @@ import path from "path";
 class MulterFactory {
 	public static getInstance(storagePath: string) {
 		const config = multer.diskStorage({
-			destination: `public/${storagePath}`,
+			destination: `files/${storagePath}`,
 			filename: function (req, file, cb) {
 				const uniqueSuffix = Date.now() + "_" + Math.round(Math.random() * 1e9);
 				cb(
