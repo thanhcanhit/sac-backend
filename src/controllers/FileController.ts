@@ -37,7 +37,8 @@ class FileController {
 		}
 
 		// File management logic
-		const { owner_id, type } = req.params;
+		const { owner_id, type } = req.body;
+		console.log("EEEE", owner_id, type);
 
 		// Check if owner_id is provided, if not delete the uploaded file
 		if (!owner_id || !type) {

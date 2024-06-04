@@ -8,12 +8,33 @@ const articleController = new ArticleController();
 const middlewareController = new MiddlewareController();
 
 articleRouter.get("/size", articleController.getArticleSize);
+articleRouter.get("/deleted/size", articleController.getDeletedArticleSize);
+articleRouter.get(
+	"/deleted",
+	middlewareController.verifyAdminToken,
+	articleController.getDeletedArticles
+);
 articleRouter.get("/:id", articleController.getArticleById);
 articleRouter.get("/", articleController.getAllArticles);
 articleRouter.post(
 	"/",
 	middlewareController.verifyAdminToken,
 	articleController.createArticle
+);
+articleRouter.patch(
+	"/:id/soft-delete",
+	middlewareController.verifyAdminToken,
+	articleController.softDeleteArticle
+);
+articleRouter.patch(
+	"/:id/viewed",
+	middlewareController.verifyToken,
+	articleController.increaseViewed
+);
+articleRouter.patch(
+	"/:id/restore",
+	middlewareController.verifyAdminToken,
+	articleController.restoreArticle
 );
 articleRouter.patch(
 	"/:id",

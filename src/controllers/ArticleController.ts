@@ -11,7 +11,7 @@ class ArticleController {
 			const { limit, page } = req.query;
 			let articles;
 			if (limit && page) {
-				articles = await Article.find()
+				articles = await Article.find({ isDeleted: false })
 					.sort({ publishedAt: -1 })
 					.limit(Number(limit))
 					.skip((Number(page) - 1) * Number(limit));
@@ -26,11 +26,36 @@ class ArticleController {
 		}
 	}
 
+	// GET /articles/deleted
+	public async getDeletedArticles(req: Request, res: Response): Promise<void> {
+		try {
+			const { limit, page } = req.query;
+			let articles;
+			if (limit && page) {
+				articles = await Article.find({ isDeleted: true })
+					.sort({ deletedAt: -1 })
+					.limit(Number(limit))
+					.skip((Number(page) - 1) * Number(limit));
+			} else {
+				articles = await Article.find().sort({ deletedAt: -1 });
+			}
+
+			const list = articles.map((article) => article.toObject());
+			res
+				.status(200)
+				.json({ message: "Get all deleted articles", deletedArticles: list });
+		} catch (err) {
+			res
+				.status(500)
+				.json({ message: "Error getting deleted articles", error: err });
+		}
+	}
+
 	// GET /articles/:id
 	public async getArticleById(req: Request, res: Response): Promise<void> {
 		try {
 			const articleId = req.params.id;
-			const article = await Article.findById(articleId);
+			const article = await Article.findById(articleId, { isDeleted: false });
 			if (!article) {
 				res.status(404).json({ message: "Product not found" });
 			}
@@ -58,7 +83,7 @@ class ArticleController {
 			res.status(201).json({ message: "Create article", article });
 			return true;
 		} catch (err) {
-			console.log(err)
+			console.log(err);
 			res.status(500).json({ message: "Error creating article", error: err });
 			return true;
 		}
@@ -83,6 +108,56 @@ class ArticleController {
 		}
 	}
 
+	// PATCH /articles/:id/soft-delete
+	public async softDeleteArticle(req: Request, res: Response): Promise<void> {
+		try {
+			const articleId = req.params.id;
+			await Article.findOneAndUpdate(
+				{ _id: articleId },
+				{ isDeleted: true, deletedAt: new Date() }
+			);
+			res
+				.status(200)
+				.json({ message: `Soft delete article with ID ${articleId}` });
+		} catch (err) {
+			res
+				.status(500)
+				.json({ message: "Error soft deleting article", error: err });
+		}
+	}
+
+	// PATCH /articles/:id/restore
+	public async restoreArticle(req: Request, res: Response): Promise<void> {
+		try {
+			const articleId = req.params.id;
+			await Article.findOneAndUpdate(
+				{ _id: articleId },
+				{ isDeleted: false, deletedAt: null }
+			);
+			res.status(200).json({ message: `Restore article with ID ${articleId}` });
+		} catch (err) {
+			res.status(500).json({ message: "Error restoring article", error: err });
+		}
+	}
+
+	// PATCH /articles/:id/viewed
+	public async increaseViewed(req: Request, res: Response): Promise<void> {
+		try {
+			const articleId = req.params.id;
+			await Article.findOneAndUpdate(
+				{ _id: articleId },
+				{ $inc: { viewed: 1 } }
+			);
+			res
+				.status(200)
+				.json({ message: `Increase viewed article with ID ${articleId}` });
+		} catch (err) {
+			res
+				.status(500)
+				.json({ message: "Error increasing viewed article", error: err });
+		}
+	}
+
 	// DELETE /articles/:id
 	public async deleteArticle(req: Request, res: Response): Promise<void> {
 		try {
@@ -100,12 +175,26 @@ class ArticleController {
 	// GET /articles/size
 	public async getArticleSize(req: Request, res: Response): Promise<void> {
 		try {
-			const size = await Article.countDocuments();
+			const size = await Article.countDocuments({ isDeleted: false });
 			res.status(200).json({ message: "Get article size", size });
 		} catch (err) {
 			res
 				.status(500)
 				.json({ message: "Error getting article size", error: err });
+		}
+	}
+	// GET /articles/deleted/size
+	public async getDeletedArticleSize(
+		req: Request,
+		res: Response
+	): Promise<void> {
+		try {
+			const size = await Article.countDocuments({ isDeleted: true });
+			res.status(200).json({ message: "Get deleted article size", size });
+		} catch (err) {
+			res
+				.status(500)
+				.json({ message: "Error deleted getting article size", error: err });
 		}
 	}
 }

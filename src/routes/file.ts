@@ -11,23 +11,27 @@ const middlewareController = new MiddlewareController();
 
 fileRouter.post(
 	"/article/",
+	middlewareController.verifyAdminToken,
 	ArticleMulterInstance,
 	fileController.uploadToTemp
 );
 
 fileRouter.patch(
 	"/article/",
+	middlewareController.verifyAdminToken,
 	ArticleMulterInstance,
 	fileController.uploadImage
 );
 
 fileRouter.post(
 	"/product/",
+	middlewareController.verifyAdminToken,
 	ProductMulterInstance,
 	fileController.uploadToTemp
 );
 fileRouter.patch(
 	"/product/",
+	middlewareController.verifyAdminToken,
 	ProductMulterInstance,
 	fileController.uploadImage
 );
