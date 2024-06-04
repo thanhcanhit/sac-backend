@@ -8,7 +8,7 @@ publicRouter.post(
     const { path } = req.params;
     console.log("PATH");
     res.status(200).sendFile(path);
-  }
+  },
 );
 
 export default publicRouter;

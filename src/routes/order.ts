@@ -9,19 +9,19 @@ const middlewareController = new MiddlewareController();
 orderRouter.get("/:id", orderController.getOrderById);
 orderRouter.get("/", orderController.getAllOrders);
 orderRouter.post(
-	"/",
-	middlewareController.verifyToken,
-	orderController.createOrder
+  "/",
+  middlewareController.verifyToken,
+  orderController.createOrder,
 );
 orderRouter.patch(
-	"/:id",
-	middlewareController.verifyToken,
-	orderController.updateOrder
+  "/:id",
+  middlewareController.verifyToken,
+  orderController.updateOrder,
 );
 orderRouter.delete(
-	"/:id",
-	middlewareController.verifyAdminToken,
-	orderController.deleteOrder
+  "/:id",
+  middlewareController.verifyAdminToken,
+  orderController.deleteOrder,
 );
 
 export default orderRouter;

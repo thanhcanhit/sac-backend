@@ -1,7 +1,7 @@
 import express from "express";
 import FileController, {
-	ArticleMulterInstance,
-	ProductMulterInstance,
+  ArticleMulterInstance,
+  ProductMulterInstance,
 } from "../controllers/FileController";
 import MiddlewareController from "../controllers/MiddlewareController";
 
@@ -10,30 +10,30 @@ const fileController = new FileController();
 const middlewareController = new MiddlewareController();
 
 fileRouter.post(
-	"/article/",
-	middlewareController.verifyAdminToken,
-	ArticleMulterInstance,
-	fileController.uploadToTemp
+  "/article/",
+  middlewareController.verifyAdminToken,
+  ArticleMulterInstance,
+  fileController.uploadToTemp,
 );
 
 fileRouter.patch(
-	"/article/",
-	middlewareController.verifyAdminToken,
-	ArticleMulterInstance,
-	fileController.uploadImage
+  "/article/",
+  middlewareController.verifyAdminToken,
+  ArticleMulterInstance,
+  fileController.uploadImage,
 );
 
 fileRouter.post(
-	"/product/",
-	middlewareController.verifyAdminToken,
-	ProductMulterInstance,
-	fileController.uploadToTemp
+  "/product/",
+  middlewareController.verifyAdminToken,
+  ProductMulterInstance,
+  fileController.uploadToTemp,
 );
 fileRouter.patch(
-	"/product/",
-	middlewareController.verifyAdminToken,
-	ProductMulterInstance,
-	fileController.uploadImage
+  "/product/",
+  middlewareController.verifyAdminToken,
+  ProductMulterInstance,
+  fileController.uploadImage,
 );
 
 export default fileRouter;

@@ -7,12 +7,9 @@ class HashString {
     return bcrypt.hash(value, salt);
   }
 
-	static async compare(
-		value: string,
-		hashedValue: string
-	): Promise<boolean> {
-		return bcrypt.compare(value, hashedValue);
-	}
+  static async compare(value: string, hashedValue: string): Promise<boolean> {
+    return bcrypt.compare(value, hashedValue);
+  }
 }
 
 export default HashString;

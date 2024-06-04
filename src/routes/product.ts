@@ -10,19 +10,19 @@ productRouter.get("/size", productController.getProductSize);
 productRouter.get("/:id", productController.getProductById);
 productRouter.get("/", productController.getAllProducts);
 productRouter.post(
-	"/",
-	middlewareController.verifyAdminToken,
-	productController.createProduct
+  "/",
+  middlewareController.verifyAdminToken,
+  productController.createProduct,
 );
 productRouter.patch(
-	"/:id",
-	middlewareController.verifyAdminToken,
-	productController.updateProduct
+  "/:id",
+  middlewareController.verifyAdminToken,
+  productController.updateProduct,
 );
 productRouter.delete(
-	"/:id",
-	middlewareController.verifyAdminToken,
-	productController.deleteProduct
+  "/:id",
+  middlewareController.verifyAdminToken,
+  productController.deleteProduct,
 );
 
 export default productRouter;
