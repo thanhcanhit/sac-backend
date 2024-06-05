@@ -28,7 +28,6 @@ articleRouter.patch(
 );
 articleRouter.patch(
   "/:id/viewed",
-  middlewareController.verifyToken,
   articleController.increaseViewed,
 );
 articleRouter.patch(

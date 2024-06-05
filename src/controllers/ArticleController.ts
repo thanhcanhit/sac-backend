@@ -146,7 +146,7 @@ class ArticleController {
       const articleId = req.params.id;
       await Article.findOneAndUpdate(
         { _id: articleId },
-        { $inc: { viewed: 1 } },
+        { $inc: { view: 1 } },
       );
       res
         .status(200)
