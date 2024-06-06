@@ -12,11 +12,14 @@ class ProductController {
       let products;
 
       if (limit && page) {
-        products = await Product.find()
+        products = await Product.find({ isDeleted: false })
+          .sort({ createdAt: -1 })
           .limit(Number(limit))
           .skip((Number(page) - 1) * Number(limit));
       } else {
-        products = await Product.find();
+        products = await Product.find({ isDeleted: false }).sort({
+          createdAt: -1,
+        });
       }
 
       const list = products.map((product) => product.toObject());
@@ -30,7 +33,7 @@ class ProductController {
   public async getProductById(req: Request, res: Response): Promise<void> {
     try {
       const productId = req.params.id;
-      const product = await Product.findById(productId);
+      const product = await Product.find({ _id: productId, isDeleted: false });
       if (!product) {
         res.status(404).json({ message: "Product not found" });
       }
@@ -46,13 +49,15 @@ class ProductController {
   // POST /products
   public async createProduct(req: Request, res: Response): Promise<boolean> {
     try {
-      const { name, images, price, discount, description } = req.body;
+      const { name, images, price, discount, description, inventory } =
+        req.body;
       const newProduct = new Product({
         name,
         images,
         price,
         discount,
         description,
+        inventory,
       });
       await newProduct.save();
       const product = await Product.findById(newProduct._id);
@@ -105,12 +110,87 @@ class ProductController {
   // GET /products/size
   public async getProductSize(req: Request, res: Response): Promise<void> {
     try {
-      const size = await Product.countDocuments();
+      const size = await Product.countDocuments({ isDeleted: false });
       res.status(200).json({ message: "Get product size", size });
     } catch (err) {
       res
         .status(500)
         .json({ message: "Error getting product size", error: err });
+    }
+  }
+
+  // GET /products/deleted
+  public async getDeletedProducts(req: Request, res: Response): Promise<void> {
+    try {
+      const { limit, page } = req.query;
+      let products;
+
+      if (limit && page) {
+        products = await Product.find({ isDeleted: true })
+          .sort({ deletedAt: -1 })
+          .limit(Number(limit))
+          .skip((Number(page) - 1) * Number(limit));
+      } else {
+        products = await Product.find({ isDeleted: true }).sort({
+          deletedAt: -1,
+        });
+      }
+
+      const list = products.map((product) => product.toObject());
+      res
+        .status(200)
+        .json({ message: "Get all deleted products", deletedProducts: list });
+    } catch (err) {
+      res
+        .status(500)
+        .json({ message: "Error getting deleted products", error: err });
+    }
+  }
+
+  // PATCH /products/:id/soft-delete
+  public async softDeleteProduct(req: Request, res: Response): Promise<void> {
+    try {
+      const productId = req.params.id;
+      await Product.findOneAndUpdate(
+        { _id: productId },
+        { isDeleted: true, deletedAt: new Date() },
+      );
+      res
+        .status(200)
+        .json({ message: `Soft delete product with ID ${productId}` });
+    } catch (err) {
+      res
+        .status(500)
+        .json({ message: "Error soft deleting product", error: err });
+    }
+  }
+
+  // PATCH /products/:id/restore
+  public async restoreProduct(req: Request, res: Response): Promise<void> {
+    try {
+      const productId = req.params.id;
+      await Product.findOneAndUpdate(
+        { _id: productId },
+        { isDeleted: false, deletedAt: null },
+      );
+      res.status(200).json({ message: `Restore product with ID ${productId}` });
+    } catch (err) {
+      res.status(500).json({ message: "Error restoring product", error: err });
+    }
+  }
+
+  // GET /products/deleted/size
+  public async getDeletedProductSize(
+    req: Request,
+    res: Response,
+  ): Promise<void> {
+    try {
+      const size = await Product.countDocuments({ isDeleted: true });
+      res.status(200).json({ message: "Get deleted product size", size });
+    } catch (err) {
+      res
+        .status(500)
+        .json({ message: "Error deleted getting product size", error: err });
     }
   }
 }

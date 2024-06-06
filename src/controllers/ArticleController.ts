@@ -16,7 +16,7 @@ class ArticleController {
           .limit(Number(limit))
           .skip((Number(page) - 1) * Number(limit));
       } else {
-        articles = await Article.find().sort({ publishDate: -1 });
+        articles = await Article.find({isDeleted: false}).sort({ publishDate: -1 });
       }
 
       const list = articles.map((article) => article.toObject());
@@ -26,28 +26,15 @@ class ArticleController {
     }
   }
 
-  // GET /articles/deleted
-  public async getDeletedArticles(req: Request, res: Response): Promise<void> {
+  // GET /articles/size
+  public async getArticleSize(req: Request, res: Response): Promise<void> {
     try {
-      const { limit, page } = req.query;
-      let articles;
-      if (limit && page) {
-        articles = await Article.find({ isDeleted: true })
-          .sort({ deletedAt: -1 })
-          .limit(Number(limit))
-          .skip((Number(page) - 1) * Number(limit));
-      } else {
-        articles = await Article.find().sort({ deletedAt: -1 });
-      }
-
-      const list = articles.map((article) => article.toObject());
-      res
-        .status(200)
-        .json({ message: "Get all deleted articles", deletedArticles: list });
+      const size = await Article.countDocuments({ isDeleted: false });
+      res.status(200).json({ message: "Get article size", size });
     } catch (err) {
       res
         .status(500)
-        .json({ message: "Error getting deleted articles", error: err });
+        .json({ message: "Error getting article size", error: err });
     }
   }
 
@@ -108,6 +95,47 @@ class ArticleController {
     }
   }
 
+  // GET /articles/deleted
+  public async getDeletedArticles(req: Request, res: Response): Promise<void> {
+    try {
+      const { limit, page } = req.query;
+      let articles;
+      if (limit && page) {
+        articles = await Article.find({ isDeleted: true })
+          .sort({ deletedAt: -1 })
+          .limit(Number(limit))
+          .skip((Number(page) - 1) * Number(limit));
+      } else {
+        articles = await Article.find({ isDeleted: true }).sort({
+          deletedAt: -1,
+        });
+      }
+
+      const list = articles.map((article) => article.toObject());
+      res
+        .status(200)
+        .json({ message: "Get all deleted articles", deletedArticles: list });
+    } catch (err) {
+      res
+        .status(500)
+        .json({ message: "Error getting deleted articles", error: err });
+    }
+  }
+
+  // DELETE /articles/:id
+  public async deleteArticle(req: Request, res: Response): Promise<void> {
+    try {
+      const articleId = req.params.id;
+
+      await Article.findOneAndDelete({ _id: articleId });
+      await fileController.deleteImageStorage(String(articleId));
+
+      res.status(200).json({ message: `Delete article with ID ${articleId}` });
+    } catch (err) {
+      res.status(500).json({ message: "Error deleting article", error: err });
+    }
+  }
+
   // PATCH /articles/:id/soft-delete
   public async softDeleteArticle(req: Request, res: Response): Promise<void> {
     try {
@@ -144,10 +172,7 @@ class ArticleController {
   public async increaseViewed(req: Request, res: Response): Promise<void> {
     try {
       const articleId = req.params.id;
-      await Article.findOneAndUpdate(
-        { _id: articleId },
-        { $inc: { view: 1 } },
-      );
+      await Article.findOneAndUpdate({ _id: articleId }, { $inc: { view: 1 } });
       res
         .status(200)
         .json({ message: `Increase viewed article with ID ${articleId}` });
@@ -158,31 +183,6 @@ class ArticleController {
     }
   }
 
-  // DELETE /articles/:id
-  public async deleteArticle(req: Request, res: Response): Promise<void> {
-    try {
-      const articleId = req.params.id;
-
-      await Article.findOneAndDelete({ _id: articleId });
-      await fileController.deleteImageStorage(String(articleId));
-
-      res.status(200).json({ message: `Delete article with ID ${articleId}` });
-    } catch (err) {
-      res.status(500).json({ message: "Error deleting article", error: err });
-    }
-  }
-
-  // GET /articles/size
-  public async getArticleSize(req: Request, res: Response): Promise<void> {
-    try {
-      const size = await Article.countDocuments({ isDeleted: false });
-      res.status(200).json({ message: "Get article size", size });
-    } catch (err) {
-      res
-        .status(500)
-        .json({ message: "Error getting article size", error: err });
-    }
-  }
   // GET /articles/deleted/size
   public async getDeletedArticleSize(
     req: Request,
