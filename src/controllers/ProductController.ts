@@ -33,7 +33,7 @@ class ProductController {
   public async getProductById(req: Request, res: Response): Promise<void> {
     try {
       const productId = req.params.id;
-      const product = await Product.find({ _id: productId, isDeleted: false });
+      const product = await Product.findOne({ _id: productId, isDeleted: false });
       if (!product) {
         res.status(404).json({ message: "Product not found" });
       }

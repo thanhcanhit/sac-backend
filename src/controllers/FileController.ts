@@ -77,8 +77,8 @@ class FileController {
       return next(error);
     }
 
-    const { publisher_id } = req.body;
-		
+    // const { publisher_id } = req.body;
+
     const imageStorage = await ImageStorage.findOne({
       ownerId: DEFAULT_OBJECT_ID,
     });
