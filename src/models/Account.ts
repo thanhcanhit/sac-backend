@@ -5,21 +5,25 @@ type Gender = "male" | "female" | "other";
 
 interface IAccount {
   _id: ObjectId;
-  username: string;
   phone: string;
   password: string;
   name: string;
+  email?: string;
   gender: Gender;
   role: UserRole;
+  avatar?: string;
+  address?: string[];
 }
 
 const accountSchema = new Schema<IAccount>({
-  username: { type: String, required: true, unique: true },
-  phone: { type: String, required: true },
+  phone: { type: String, required: true, unique: true },
   password: { type: String, required: true },
+  email: { type: String, unique: true },
   name: { type: String, required: true },
   gender: { type: String, required: true, default: "other" },
   role: { type: String, required: true, default: "user" },
+  avatar: { type: String },
+  address: { type: [String], default: [] },
 });
 
 export default model<IAccount>("Account", accountSchema);

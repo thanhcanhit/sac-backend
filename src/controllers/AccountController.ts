@@ -17,23 +17,41 @@ class AccountController {
 
   // POST /auth/register
   public async register(req: Request, res: Response) {
-    const { username, phone, password, gender, name } = req.body;
+    const { phone, password, gender, name, email, avatar, address } = req.body;
 
-    if (!username || !phone || !password) {
+    if (!phone || !password || !name || !gender) {
       return res.status(400).json({ message: "Missing required fields" });
+    }
+
+    // Validate unique phone
+    const isPhoneExist = await Account.findOne({ phone });
+    if (isPhoneExist) {
+      return res.status(400).json({ message: "Phone number already exist" });
+    }
+
+    // Validate unique email
+    if (email) {
+      const isEmailExist = await Account.findOne({ email });
+      if (isEmailExist) {
+        return res.status(400).json({ message: "Email already exist" });
+      }
     }
 
     const hashedPassword = await HashString.hash(password);
     try {
       const user = new Account({
-        username,
         phone,
         password: hashedPassword,
         gender,
         name,
+        email,
+        avatar,
+        address,
       });
       await user.save();
+      // Remove password from response
       const { password, ...userWithoutPassword } = user.toObject();
+
       res.status(201).json({
         message: "Account created successfully",
         user: userWithoutPassword,
@@ -45,8 +63,8 @@ class AccountController {
 
   // POST /auth/login
   public async login(req: Request, res: Response, next: NextFunction) {
-    const { username, password } = req.body;
-    if (!username || !password) {
+    const { phone, password } = req.body;
+    if (!phone || !password) {
       return res.status(400).json({ message: "Missing required fields" });
     }
 
@@ -54,10 +72,12 @@ class AccountController {
     console.log(req.body);
 
     try {
-      const user = await Account.findOne({ username });
+      // Find user by phone
+      const user = await Account.findOne({ phone });
       if (!user) {
         return res.status(401).json({ message: "User not found" });
       }
+      // Compare password
       const isPasswordMatch = await HashString.compare(
         passwordInput,
         user.password,
@@ -66,8 +86,10 @@ class AccountController {
         return res.status(401).json({ message: "Invalid password" });
       }
 
+      // Remove password from response
       const { password, ...tokenPayload } = user.toObject();
 
+      // Generate token
       const token = JsonWebToken.generatePrivateToken(tokenPayload);
       const refreshToken = JsonWebToken.generatePublicToken(tokenPayload);
       const isCreated = await this.tokenController.createToken(
@@ -79,12 +101,14 @@ class AccountController {
         return res.status(500).json({ message: "Error creating token" });
       }
 
+      // Set refresh token to cookie
       res.cookie("REFRESH_TOKEN", refreshToken, {
         httpOnly: true,
         secure: false,
         sameSite: true,
       });
 
+      // Return token
       return res.status(200).json({
         message: "Completed",
         data: {
@@ -100,19 +124,24 @@ class AccountController {
   // POST /auth/refresh
   async refresh(req: Request, res: Response, next: NextFunction) {
     try {
+      // Get refresh token from cookie
       const refreshToken = req.cookies?.REFRESH_TOKEN;
       if (!refreshToken) return res.sendStatus(401);
+
+      // Decode token
       const decode = JsonWebToken.verifyPublicToken(refreshToken);
       if (!decode || typeof decode !== "object") {
         return res.sendStatus(403);
       }
-      if (decode?.isUsed) return res.sendStatus(403);
-      const jwtPayload = decode as JwtPayload;
-
-      // Generate new token
-      const { iat, exp, ...tokenPayload } = jwtPayload;
 
       // Check if token is used
+      if (decode?.isUsed) return res.sendStatus(403);
+
+      // Generate new token
+      const jwtPayload = decode as JwtPayload;
+      const { iat, exp, ...tokenPayload } = jwtPayload;
+
+      // Check if token is used in database
       const isUsed: boolean = await this.tokenController.isValidToken(
         tokenPayload._id,
         refreshToken,
@@ -156,9 +185,6 @@ class AccountController {
 
   // POST /auth/logout
   async logout(req: Request, res: Response) {
-    // Initialize tokenController here
-    const tokenController = new TokenController();
-
     res.clearCookie("REFRESH_TOKEN");
     res.json({
       message: "Logout completed",
