@@ -16,7 +16,9 @@ class ArticleController {
           .limit(Number(limit))
           .skip((Number(page) - 1) * Number(limit));
       } else {
-        articles = await Article.find({isDeleted: false}).sort({ publishDate: -1 });
+        articles = await Article.find({ isDeleted: false }).sort({
+          publishDate: -1,
+        });
       }
 
       const list = articles.map((article) => article.toObject());
