@@ -23,7 +23,11 @@ const accountSchema = new Schema<IAccount>({
   gender: { type: String, required: true, default: "other" },
   role: { type: String, required: true, default: "user" },
   avatar: { type: String },
-  address: { type: [String], default: [] },
+  address: { type: [String], default: [], unique: true },
 });
 
+// craete index for phone
+accountSchema.index({ phone: 1 });
+// create index for email
+accountSchema.index({ email: 1 });
 export default model<IAccount>("Account", accountSchema);
