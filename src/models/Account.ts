@@ -23,7 +23,7 @@ const accountSchema = new Schema<IAccount>({
   gender: { type: String, required: true, default: "other" },
   role: { type: String, required: true, default: "user" },
   avatar: { type: String },
-  address: { type: [String], default: [], unique: true },
+  address: { type: [String], default: [], unique: false },
 });
 
 // craete index for phone

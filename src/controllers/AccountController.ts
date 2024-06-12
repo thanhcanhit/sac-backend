@@ -30,12 +30,10 @@ class AccountController {
     }
 
     // Validate unique email
-    if (email) {
       const isEmailExist = await Account.findOne({ email });
       if (isEmailExist) {
         return res.status(400).json({ message: "Email already exist" });
       }
-    }
 
     const hashedPassword = await HashString.hash(password);
     try {
@@ -57,24 +55,26 @@ class AccountController {
         user: userWithoutPassword,
       });
     } catch (err) {
-      console.log(err)
+      console.log(err);
       res.status(500).json(err);
     }
   }
 
   // POST /auth/login
   public async login(req: Request, res: Response, next: NextFunction) {
-    const { phone, password } = req.body;
-    if (!phone || !password) {
+    // username is phone or email
+    const { username, password } = req.body;
+    if (!username || !password) {
       return res.status(400).json({ message: "Missing required fields" });
     }
 
     const passwordInput = password as string;
-    console.log(req.body);
 
     try {
       // Find user by phone
-      const user = await Account.findOne({ phone });
+      const user =
+        (await Account.findOne({ phone: username })) ||
+        (await Account.findOne({ email: username }));
       if (!user) {
         return res.status(401).json({ message: "User not found" });
       }
