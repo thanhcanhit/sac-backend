@@ -21,13 +21,7 @@ const app = express();
 // Support cors
 app.use(
   cors({
-    origin: [
-      "http://localhost:5173",
-      "http://localhost:3000",
-      "https://thanhcanhit.github.io",
-      "https://smartairconclothing.com",
-      "http://smartairconclothing.com",
-    ],
+    origin: '*',
     credentials: true,
   }),
 );
