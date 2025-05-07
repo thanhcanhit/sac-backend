@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: sac-backend
+    restart: unless-stopped
+    volumes:
+      - ./files:/app/files
+      - ./public:/app/public
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - DB_URL=mongodb://sac-mongo:27017/sac
+      # Add any other environment variables your app needs below
+    depends_on:
+      - mongo
+    networks:
+      - sac-network
+
+  mongo:
+    image: mongo:6
+    container_name: sac-mongo
+    restart: unless-stopped
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - sac-network
+
+networks:
+  sac-network:
+    driver: bridge
+
+volumes:
+  mongo-data:
+    driver: local 
